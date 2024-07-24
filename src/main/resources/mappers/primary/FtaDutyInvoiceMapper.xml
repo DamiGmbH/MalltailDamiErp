@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.malltail.erp.mapper.primary.FtaDutyInvoiceMapper">
+    <select id="ExcelDownList" parameterType="com.malltail.erp.dto.FtaDutyInvoiceDto" resultType="com.malltail.erp.vo.FtaDutyInvoiceVo">
+        SELECT
+            A.RELEASE_DATE,
+            A.ORDER_NUM,
+            A.ITEM_CNT,
+            B.ITEM_NAME,
+            B.UNIT_PRICE,
+            C.RECEIVER_NAME,
+            C.ADDRESS,
+            C.PHONE_NUM,
+            C.TRACKING_NUM,
+            C.COMPANY_NAME
+        FROM ORDER_RELEASE_ITEM_DETAIL A,
+            CARGO_ITEM_DEFAULT_INFO B,
+            ORDER_RELEASE_ITEM_LIST C
+        WHERE A.RELEASE_DATE <![CDATA[>=]]> #{startdate}
+        AND A.RELEASE_DATE <![CDATA[<=]]> #{enddate}
+        AND A.RELEASE_DATE = C.RELEASE_DATE
+        AND A.ORDER_NUM = C.ORDER_NUM
+        <if test='shipmentcode == 2'>
+        AND (C.TRACKING_NUM LIKE '343%' OR C.TRACKING_NUM LIKE '6063%')
+        </if>
+        AND LENGTH(C.TRACKING_NUM) > 7
+        AND LENGTH(A.PRIVATE_CUSTOM_NUM) > 0
+        AND A.PRIVATE_CUSTOM_NUM NOT LIKE '%판매%'
+        AND A.CANCEL_YN = 'N'
+        AND A.ITEM_CODE = B.ITEM_CODE
+        AND B.FTA_DUTY_YN = 'Y'
+        ORDER BY 1, 2
+    </select>
+</mapper>

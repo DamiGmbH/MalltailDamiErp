@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.malltail.erp.mapper.second.ExcRateMapper">
+    <select id="excRateUsd" resultType="double">
+        SELECT
+            EXC_RATE_LOG_RAITO
+        FROM	GL_EXC_RATE_LOGS
+        WHERE 	EXC_FLAG = 'USD'
+        ORDER	BY	EXC_RATE_LOG_SQ DESC
+        LIMIT	1
+    </select>
+
+</mapper>

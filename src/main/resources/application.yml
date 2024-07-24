@@ -1,0 +1,78 @@
+server:
+  port: 8088
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  tomcat:
+    accesslog:
+      enabled: true
+      directory: D:/WorkProject/MalltailDamiErp/logs/access
+      prefix: access_log.
+      suffix: .txt
+      #rotate: true
+      file-date-format: yy-MM-dd #yy-MM-dd.HH
+      #encoding: UTF-8
+      #max-days: -1
+      #rename-on-rotate: false
+      #buffered: false
+      #condition-if: name #ServletRequest.getAttribute("name") != null
+      #condition-unless: name #ServletRequest.getAttribute("name") == null
+      pattern: '%h %l %u [%{yy-MM-dd:HH:mm:ss}t] "%r" %s %b %D %{User-Agent}i' #'%h %l %u %t "%r" %s %b'
+spring:
+  primary-db:
+    datasource:
+      hikari:
+        #jdbc-url: jdbc:mariadb://160.251.102.134:3306/maria_st
+        #jdbc-url: jdbc:log4jdbc:mariadb://160.251.102.134:3306/maria_st
+        jdbc-url: jdbc:log4jdbc:mariadb://localhost:3306/mariadb?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+        driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+        #driver-class-name: org.mariadb.jdbc.Driver
+        #jdbc-url: jdbc:log4jdbc:mariadb://160.251.102.134:3306/maria_st
+        #driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+        username: user1
+        password: user123!
+        connection-test-query: "SELECT NOW() FROM dual"
+        pool-name: Hikari Primary Connection Pool
+        connection-timeout: 3000
+        validation-timeout: 3000
+        minimum-idle: 5
+        max-lifetime: 240000
+        maximum-pool-size: 2
+  second-db:
+    datasource:
+      hikari:
+        #jdbc-url: jdbc:mariadb://160.251.102.134:3306/maria_st
+        #jdbc-url: jdbc:log4jdbc:mariadb://160.251.102.134:3306/maria_st
+        jdbc-url: jdbc:log4jdbc:mariadb://dev-damigmbh.cmbhrpc3l0di.eu-central-1.rds.amazonaws.com:3306/DAMI?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true
+        driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+        #driver-class-name: org.mariadb.jdbc.Driver
+        #jdbc-url: jdbc:log4jdbc:mariadb://160.251.102.134:3306/maria_st
+        #driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+        username: info
+        password: dami0987654
+        connection-test-query: "SELECT NOW() FROM DUAL"
+        pool-name: Hikari Second Connection Pool
+        connection-timeout: 3000
+        validation-timeout: 3000
+        minimum-idle: 5
+        max-lifetime: 240000
+        maximum-pool-size: 2
+  servlet:
+    multipart:
+      maxFileSize: 10MB
+      maxRequestSize: 50MB
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+logging:
+  level:
+    com.zaxxer.hikari.pool.HikariPool: WARN
+    com.zaxxer.hikari.HikariConfig: WARN
+    com.zaxxer.hikari: WARN
+ftainvoice:
+  image-name:
+    excel-gmbh-img: eurooutlet24_gmbh.jpg
+    excel-sign-img: eurooutlet24_sign.jpg

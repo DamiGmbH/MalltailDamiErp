@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.malltail.erp.mapper.primary.PurchaseExecuteMapper">
+    <select id="PurchaseExecuteExcelList" parameterType="com.malltail.erp.dto.PurchaseExecuteDto" resultType="com.malltail.erp.vo.PurchaseExecuteVo">
+        SELECT
+            A.RELEASE_DATE,
+            A.ORDER_NUM,
+            C.FOOD_TYPE,
+            A.TRACKING_NUM,
+            A.RECEIVER_NAME,
+            A.PHONE_NUM,
+            A.PRIVATE_CUSTOM_NUM,
+            A.MARKET_NAME,
+            A.COMPANY_NAME,
+            E.PUR_COMPANY_NAME,
+            E.PUR_PRESIDENT_NAME,
+            E.PUR_ADDRESS,
+            E.PUR_PHONE_NUM,
+            E.PUR_REGISTER_NUM,
+            E.PUR_ELE_REGISTER_NUM,
+            F.PUR_URL,
+            C.ITEM_NAME,
+            C.MAKING_COMPANY_NM,
+            C.MAKING_NATIONAL_CODE,
+            B.ITEM_CNT
+        FROM ORDER_RELEASE_ITEM_LIST A,
+            ORDER_RELEASE_ITEM_DETAIL B,
+            CARGO_ITEM_DEFAULT_INFO C,
+            TRACKING_SEND_COMPANY_INFO D,
+            PURCHASE_EXECUTE_COMPANY_INFO E,
+            PURCHASE_EXECUTE_URL_INFO F
+        WHERE A.RELEASE_DATE <![CDATA[>=]]> #{startdate}
+        AND A.RELEASE_DATE <![CDATA[<=]]> #{enddate}
+        AND A.RELEASE_DATE = B.RELEASE_DATE
+        AND A.ORDER_NUM = B.ORDER_NUM
+        AND B.ITEM_CODE = C.ITEM_CODE
+        AND A.COMPANY_NAME = E.PUR_CODE
+        AND A.COMPANY_NAME = F.PUR_URL_KEY
+        AND C.FOOD_DECLARE_YN = 'Y'
+        AND A.CANCEL_YN = 'N'
+        AND B.CANCEL_YN = 'N'
+        AND LENGTH(B.PRIVATE_CUSTOM_NUM) > 0
+        AND B.PRIVATE_CUSTOM_NUM NOT LIKE '%판매%'
+        AND UCASE(B.COMPANY_NAME) NOT LIKE 'EUROSTORE%'
+        <if test=' "N".equals(uploaduse) '>
+            AND B.PRIVATE_CUSTOM_NUM NOT LIKE '%출고%'
+            AND UCASE(B.COMPANY_NAME) NOT IN ('DAMIOPEN','DABAEOPEN','GPS','MARCO')
+        </if>
+        <if test=' "Y".equals(uploaduse) '>
+            AND B.PRIVATE_CUSTOM_NUM NOT LIKE '%NHN출고%'
+            AND UCASE(B.COMPANY_NAME) NOT IN ('DAMIOPEN','DABAEOPEN','GPS')
+        </if>
+        AND UCASE(A.COMPANY_NAME) = UCASE(D.COMPANY_NAME)
+        ORDER BY 1, 2, 3
+    </select>
+    <select id="PurchaseExecuteExcelItemList" parameterType="com.malltail.erp.dto.PurchaseExecuteDto" resultType="com.malltail.erp.vo.PurchaseExecuteItemVo">
+        SELECT
+        A.PRIVATE_CUSTOM_NUM,
+        C.ITEM_NAME,
+        C.MAKING_COMPANY_NM,
+        C.MAKING_NATIONAL_CODE,
+        B.ITEM_CNT
+        FROM ORDER_RELEASE_ITEM_LIST A,
+        ORDER_RELEASE_ITEM_DETAIL B,
+        CARGO_ITEM_DEFAULT_INFO C,
+        TRACKING_SEND_COMPANY_INFO D
+        WHERE A.RELEASE_DATE <![CDATA[>=]]> #{startdate}
+        AND A.RELEASE_DATE <![CDATA[<=]]> #{enddate}
+        AND A.RELEASE_DATE = B.RELEASE_DATE
+        AND A.ORDER_NUM = B.ORDER_NUM
+        AND B.ITEM_CODE = C.ITEM_CODE
+        AND C.FOOD_DECLARE_YN = 'Y'
+        AND A.CANCEL_YN = 'N'
+        AND B.CANCEL_YN = 'N'
+        AND LENGTH(B.PRIVATE_CUSTOM_NUM) > 0
+        AND B.PRIVATE_CUSTOM_NUM NOT LIKE '%판매%'
+        AND UCASE(B.COMPANY_NAME) NOT LIKE 'EUROSTORE%'
+        <if test=' "N".equals(uploaduse) '>
+            AND B.PRIVATE_CUSTOM_NUM NOT LIKE '%출고%'
+            AND UCASE(B.COMPANY_NAME) NOT IN ('DAMIOPEN','DABAEOPEN','GPS','MARCO')
+        </if>
+        <if test=' "Y".equals(uploaduse) '>
+            AND B.PRIVATE_CUSTOM_NUM NOT LIKE '%NHN출고%'
+            AND UCASE(B.COMPANY_NAME) NOT IN ('DAMIOPEN','DABAEOPEN','GPS')
+        </if>
+        AND UCASE(A.COMPANY_NAME) = UCASE(D.COMPANY_NAME)
+    </select>
+</mapper>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layout/basic">
+
+<th:block layout:fragment="title">
+    <title>식품신고내역</title>
+</th:block>
+
+<th:block layout:fragment="content">
+    <div class="page_tits">
+        <h3>식품신고내역 생성</h3>
+    </div>
+
+    <div>
+        <form id="saveForm" method="post" th:object="${formData}">
+            <input type="text" th:attr="style='width: 100px; height: 30px;'" id="startDate" name="startdate" th:value="*{startdate}"> ~
+            <input type="text" th:attr="style='width: 100px; height: 30px;'" id="endDate" name="enddate" th:value="*{enddate}">&nbsp;&nbsp;
+
+            <button type="button" id="saveBtn" onclick="savePost();" class="btn btn-primary">down</button>
+        </form>
+        <div id="calendar"></div>
+    </div>
+</th:block>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        function savePost() {
+            const frm = document.getElementById('saveForm');
+
+            if (frm.startdate.value === "") {
+                alert("시작날짜를 선택해 주세요.");
+                return;
+            }
+
+            if (frm.enddate.value === "") {
+                alert("종료날짜를 선택해 주세요.");
+                return;
+            }
+
+            const sdate = new Date(frm.startdate.value);
+            const edate = new Date(frm.enddate.value);
+
+            if (sdate > edate) {
+                alert("시작날짜가 종료날짜보다 큽니다.\n다시 선택해 주세요.");
+                return;
+            }
+
+            const formData = new FormData(frm);
+
+            // First controller call
+            fetch('/purchase/purchaseExecuteExcelDown.do', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                } else {
+                    throw new Error('식품신고 파일 download 실패');
+                }
+            })
+            .then(blob => {
+                // Trigger download for the first Excel file
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = '식품신고.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+
+                // Second controller call
+                return fetch('/purchase/purchaseExecuteExcelDownUpload.do', {
+                    method: 'POST',
+                    body: formData
+                });
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                } else {
+                    throw new Error('식품신고_업로드 파일 다운로드 실패');
+                }
+            })
+            .then(blob => {
+                // Trigger download for the second Excel file
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = '식품신고_업로드.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+
+                alert('다운로드 완료');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error: ' + error.message);
+            });
+        }
+    </script>
+</th:block>
+</html>
